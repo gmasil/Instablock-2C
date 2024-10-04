@@ -1,18 +1,26 @@
-.PHONY: clean run format
+.PHONY: clean run format test
+
+BINARY_NAME := instablock
 
 CC := gcc
-SRC_DIR := src
+SRC_DIR := src/main
+TEST_DIR := src/test
 BUILD_DIR := out
 OBJ_DIR := $(BUILD_DIR)/obj
 DEPS_DIR := $(BUILD_DIR)/deps
-BINARY_NAME := instablock
+TEST_OBJ_DIR := $(BUILD_DIR)/test
 
 SOURCES := $(wildcard $(SRC_DIR)/*/c/*.c)
 OBJECTS := $(subst $(SRC_DIR)/,$(OBJ_DIR)/,$(patsubst %.c,%.o,$(SOURCES)))
 DEPENDS := $(subst $(SRC_DIR)/,$(DEPS_DIR)/,$(patsubst %.c,%.d,$(SOURCES)))
 INCLUDE := $(addprefix -I,$(wildcard $(SRC_DIR)/*/header))
 
-CFLAGS := $(INCLUDE) -std=c99 -W -Wall -Wextra -pedantic -pedantic-errors -Wstrict-prototypes -Wdeclaration-after-statement
+TEST_SOURCES := $(wildcard $(TEST_DIR)/*/*.c)
+TEST_OBJECTS := $(subst $(TEST_DIR)/,$(TEST_OBJ_DIR)/,$(patsubst %.c,%.o,$(TEST_SOURCES)))
+
+$(info TEST_OBJECTS = $(TEST_OBJECTS))
+
+CFLAGS := $(INCLUDE) -std=c99 -W -Wall -Wextra -pedantic -pedantic-errors -Wstrict-prototypes # -Wdeclaration-after-statement
 LINKER_ARGS := -lglfw -lGLEW -framework OpenGL
 
 $(BUILD_DIR)/$(BINARY_NAME): $(OBJECTS)
@@ -46,3 +54,10 @@ clean:
 
 run: $(BUILD_DIR)/$(BINARY_NAME)
 	$(BUILD_DIR)/$(BINARY_NAME)
+
+$(TEST_OBJ_DIR)/test_runner.o $(TEST_OBJECTS): $(OBJECTS) $(TEST_SOURCES) $(TEST_DIR)/test_runner.c
+	@mkdir -p $(@D)
+	$(CC) -o $@ $(subst $(TEST_OBJ_DIR)/,$(TEST_DIR)/,$(patsubst %.o,%.c,$@)) $(CFLAGS)
+
+test: $(TEST_OBJECTS) $(TEST_OBJ_DIR)/test_runner.o
+	$(TEST_OBJ_DIR)/test_runner.o $(TEST_OBJECTS)

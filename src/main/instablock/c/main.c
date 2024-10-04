@@ -74,7 +74,7 @@ int main(void) {
     glGenVertexArrays(1, &vertexArrayID);
     glBindVertexArray(vertexArrayID);
 
-    GLuint programID    = load_shaders("src/main/shader/simple.vert", "src/main/shader/simple.frag");
+    GLuint programID    = load_shaders("src/main/instablock/shader/simple.vert", "src/main/instablock/shader/simple.frag");
     GLuint modelID      = glGetUniformLocation(programID, "model");
     GLuint viewID       = glGetUniformLocation(programID, "view");
     GLuint projectionID = glGetUniformLocation(programID, "projection");
