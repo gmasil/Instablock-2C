@@ -94,16 +94,18 @@ int main(void) {
     float rot_speed  = 0.0005f;
     float walk_speed = 10.0f;
 
-    // position of loaded object
-    float *modelMatrix = create_matrix4();
-
-    struct RenderObject obj1 = load_render_object("demo.obj");
-    struct RenderObject obj2 = load_render_object("demo2.obj");
-    obj2.z                   = -5;
-
     // load textures
     GLuint demo_texture  = load_bmp("demo.bmp");
     GLuint demo_texture2 = load_bmp("demo2.bmp");
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_2D, demo_texture);
+    glActiveTexture(GL_TEXTURE1);
+    glBindTexture(GL_TEXTURE_2D, demo_texture2);
+
+    // load objects
+    struct RenderObject obj1 = load_render_object("demo.obj", 0);
+    struct RenderObject obj2 = load_render_object("demo2.obj", 1);
+    set_position(obj2, 0, 0, -5);
 
     // glfwSetKeyCallback(window, key_callback);
 
@@ -197,17 +199,8 @@ int main(void) {
         glUniformMatrix4fv(projectionID, 1, GL_FALSE, projectionMatrix);
         glUniform3fv(cameraID, 1, camera_pos);
 
-        glActiveTexture(GL_TEXTURE0);
-        glBindTexture(GL_TEXTURE_2D, demo_texture);
-        glUniform1i(textureID, 0);
-
-        render(obj1, modelID, modelMatrix);
-
-        glActiveTexture(GL_TEXTURE0);
-        glBindTexture(GL_TEXTURE_2D, demo_texture2);
-        glUniform1i(textureID, 0);
-
-        render(obj2, modelID, modelMatrix);
+        render(obj1, modelID, textureID);
+        render(obj2, modelID, textureID);
 
         // Swap buffers
         glfwSwapBuffers(window);
