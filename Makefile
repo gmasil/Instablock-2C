@@ -17,8 +17,7 @@ INCLUDE := $(addprefix -I,$(wildcard $(SRC_DIR)/*/header))
 
 TEST_SOURCES := $(wildcard $(TEST_DIR)/*/*.c)
 TEST_OBJECTS := $(subst $(TEST_DIR)/,$(TEST_OBJ_DIR)/,$(patsubst %.c,%.o,$(TEST_SOURCES)))
-
-$(info TEST_OBJECTS = $(TEST_OBJECTS))
+SOURCES_WITHOUT_MAIN := $(filter-out %/main.c,$(SOURCES))
 
 CFLAGS := $(INCLUDE) -std=c99 -W -Wall -Wextra -pedantic -pedantic-errors -Wstrict-prototypes # -Wdeclaration-after-statement
 LINKER_ARGS := -lglfw -lGLEW -framework OpenGL
@@ -55,9 +54,9 @@ clean:
 run: $(BUILD_DIR)/$(BINARY_NAME)
 	$(BUILD_DIR)/$(BINARY_NAME)
 
-$(TEST_OBJ_DIR)/test_runner.o $(TEST_OBJECTS): $(OBJECTS) $(TEST_SOURCES) $(TEST_DIR)/test_runner.c
+$(TEST_OBJ_DIR)/test_runner.o $(TEST_OBJECTS): $(TEST_SOURCES) $(TEST_DIR)/test_runner.c
 	@mkdir -p $(@D)
-	$(CC) -o $@ $(subst $(TEST_OBJ_DIR)/,$(TEST_DIR)/,$(patsubst %.o,%.c,$@)) $(CFLAGS)
+	$(CC) -o $@ $(subst $(TEST_OBJ_DIR)/,$(TEST_DIR)/,$(patsubst %.o,%.c,$@)) $(SOURCES_WITHOUT_MAIN) $(CFLAGS) $(LINKER_ARGS)
 
-test: $(TEST_OBJECTS) $(TEST_OBJ_DIR)/test_runner.o
+test: $(TEST_OBJ_DIR)/test_runner.o $(TEST_OBJECTS)
 	$(TEST_OBJ_DIR)/test_runner.o $(TEST_OBJECTS)
