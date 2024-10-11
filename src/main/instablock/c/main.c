@@ -95,15 +95,15 @@ int main(void) {
     float walk_speed = 10.0f;
 
     // load textures
-    GLuint demo_texture  = load_bmp("demo.bmp");
-    GLuint demo_texture2 = load_bmp("demo2.bmp");
+    GLuint demo_texture  = load_bmp("terrain.bmp", 0);
+    GLuint demo_texture2 = load_bmp("demo2.bmp", 1);
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, demo_texture);
     glActiveTexture(GL_TEXTURE1);
     glBindTexture(GL_TEXTURE_2D, demo_texture2);
 
     // load objects
-    struct RenderObject obj1 = load_render_object("demo.obj", 0);
+    struct RenderObject obj1 = load_render_object("cube.obj", 0);
     struct RenderObject obj2 = load_render_object("demo2.obj", 1);
     set_position(obj2, 0, 0, -5);
 

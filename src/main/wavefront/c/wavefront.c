@@ -201,8 +201,7 @@ float *loadWavefrontObj(char *file_path, int *loaded_faces) {
                     textures[texture_index++] = float_values[i];
                 }
             }
-        }
-        if (current_line[0] == 'f') {
+        } else if (current_line[0] == 'f') {
             extract_indices(current_line, indice_values);
             for (i = 0; i < 3; i++) {
                 // vertex data

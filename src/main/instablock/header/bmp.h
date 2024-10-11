@@ -3,6 +3,6 @@
 
 #include <GL/glew.h>
 
-GLuint load_bmp(char *filename);
+GLuint load_bmp(char *filename, int filter);
 
 #endif // BMP_H

@@ -4,7 +4,7 @@
 
 #include "bmp.h"
 
-GLuint load_bmp(char *filename) {
+GLuint load_bmp(char *filename, int filter) {
     printf("Reading bmp image from %s\n", filename);
 
     // Data read from the header of the BMP file
@@ -66,10 +66,16 @@ GLuint load_bmp(char *filename) {
     if (dataPos == 0) {
         dataPos = 54; // The BMP header is done that way
     }
+    // bytes between header and actual data
+    int seek_amount = dataPos - 54;
 
     // Create a buffer
     data = malloc(imageSize);
 
+    // seek forward if there is a gap between header and data
+    if (seek_amount > 0) {
+        fseek(file, seek_amount, SEEK_CUR);
+    }
     // Read the actual data from the file into the buffer
     fread(data, 1, imageSize, file);
 
@@ -93,11 +99,17 @@ GLuint load_bmp(char *filename) {
     // trilinear filtering
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-    // mipmaps required by trilinear filtering. Generate them automatically.
-    glGenerateMipmap(GL_TEXTURE_2D);
-
+    if (filter == 0) {
+        // minecraft style
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+    } else {
+        // trilinear filtering
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+        // mipmaps required by trilinear filtering. Generate them automatically.
+        glGenerateMipmap(GL_TEXTURE_2D);
+    }
     // Return the ID of the texture we just created
     return textureID;
 }
