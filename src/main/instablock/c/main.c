@@ -103,9 +103,18 @@ int main(void) {
     glBindTexture(GL_TEXTURE_2D, demo_texture2);
 
     // load objects
-    struct RenderObject obj1 = load_render_object("cube.obj", 0);
     struct RenderObject obj2 = load_render_object("demo2.obj", 1);
     set_position(obj2, 0, 0, -5);
+
+    int world_size             = 20;
+    int cube_amount            = world_size * world_size;
+    struct RenderObject *cubes = malloc(cube_amount * sizeof(struct RenderObject));
+    for (int x = 0; x < world_size; x++) {
+        for (int y = 0; y < world_size; y++) {
+            cubes[x * world_size + y] = load_render_object("cube.obj", 0);
+            set_position(cubes[x * world_size + y], (world_size/2) - x, -5, (world_size/2) + y);
+        }
+    }
 
     // glfwSetKeyCallback(window, key_callback);
 
@@ -199,8 +208,10 @@ int main(void) {
         glUniformMatrix4fv(projectionID, 1, GL_FALSE, projectionMatrix);
         glUniform3fv(cameraID, 1, camera_pos);
 
-        render(obj1, modelID, textureID);
         render(obj2, modelID, textureID);
+        for (int i = 0; i < cube_amount; i++) {
+            render(cubes[i], modelID, textureID);
+        }
 
         // Swap buffers
         glfwSwapBuffers(window);
@@ -209,8 +220,10 @@ int main(void) {
     } // Check if the ESC key was pressed or the window was closed
     while (glfwGetKey(window, GLFW_KEY_ESCAPE) != GLFW_PRESS && glfwWindowShouldClose(window) == 0);
 
-    unload_render_object(obj1);
     unload_render_object(obj2);
+    for (int i = 0; i < cube_amount; i++) {
+        unload_render_object(cubes[i]);
+    }
     glDeleteProgram(programID);
     glDeleteVertexArrays(1, &vertexArrayID);
 
