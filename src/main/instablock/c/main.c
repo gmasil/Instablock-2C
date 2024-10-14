@@ -12,6 +12,7 @@
 #include "load_shader.h"
 #include "render_object.h"
 #include "wavefront.h"
+#include "world.h"
 
 #define PI_HALF 1.5707964f
 
@@ -106,15 +107,7 @@ int main(void) {
     struct RenderObject obj2 = load_render_object("demo2.obj", 1);
     set_position(obj2, 0, 0, -5);
 
-    int world_size             = 20;
-    int cube_amount            = world_size * world_size;
-    struct RenderObject *cubes = malloc(cube_amount * sizeof(struct RenderObject));
-    for (int x = 0; x < world_size; x++) {
-        for (int y = 0; y < world_size; y++) {
-            cubes[x * world_size + y] = load_render_object("cube.obj", 0);
-            set_position(cubes[x * world_size + y], (world_size / 2) - x, -5, (world_size / 2) + y);
-        }
-    }
+    struct World world = generate_world(20);
 
     // glfwSetKeyCallback(window, key_callback);
 
@@ -233,9 +226,7 @@ int main(void) {
         glUniform3fv(cameraID, 1, camera_pos);
 
         render(obj2, modelID, textureID);
-        for (int i = 0; i < cube_amount; i++) {
-            render(cubes[i], modelID, textureID);
-        }
+        render_world(world, modelID, textureID);
 
         // Swap buffers
         glfwSwapBuffers(window);
@@ -245,9 +236,8 @@ int main(void) {
     while (glfwGetKey(window, GLFW_KEY_ESCAPE) != GLFW_PRESS && glfwWindowShouldClose(window) == 0);
 
     unload_render_object(obj2);
-    for (int i = 0; i < cube_amount; i++) {
-        unload_render_object(cubes[i]);
-    }
+    destroy_world(world);
+
     glDeleteProgram(programID);
     glDeleteVertexArrays(1, &vertexArrayID);
 
