@@ -49,7 +49,7 @@ int main(void) {
 
     GLFWwindow *window; // (In the accompanying source code, this variable is
                         // global for simplicity)
-    window = glfwCreateWindow(1024, 768, "Tutorial 01", NULL, NULL);
+    window = glfwCreateWindow(800, 600, "Tutorial 01", NULL, NULL);
     if (window == NULL) {
         fprintf(stderr, "Failed to open GLFW window. If you have an Intel GPU, they are "
                         "not 3.3 compatible. Try the 2.1 version of the tutorials.\n");
@@ -112,7 +112,7 @@ int main(void) {
     for (int x = 0; x < world_size; x++) {
         for (int y = 0; y < world_size; y++) {
             cubes[x * world_size + y] = load_render_object("cube.obj", 0);
-            set_position(cubes[x * world_size + y], (world_size/2) - x, -5, (world_size/2) + y);
+            set_position(cubes[x * world_size + y], (world_size / 2) - x, -5, (world_size / 2) + y);
         }
     }
 
@@ -141,10 +141,34 @@ int main(void) {
     glfwGetCursorPos(window, &mouse_x, &mouse_y);
     glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
+    float player_velocity = 0.0f;
+
     do {
         last_time    = current_time;
         current_time = glfwGetTime();
         delta_time   = current_time - last_time;
+
+        // ground collision and jump
+        int on_ground = 0;
+        player_velocity -= 9.81f * delta_time * 2;
+        if (camera_pos[1] <= -2) {
+            // player on ground
+            camera_pos[1]   = -2;
+            player_velocity = 0;
+            on_ground       = 1;
+            if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS) {
+                player_velocity = 8.0f;
+                on_ground       = 0;
+            }
+        }
+        if (!on_ground) {
+            camera_pos[1] += player_velocity * delta_time;
+        }
+
+        int space_pressed = glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS;
+        printf("delta: %f, player_velocity: %f, on_ground: %d, space_pressed: %d\n", delta_time, player_velocity, on_ground, space_pressed);
+
+        // end ground collision and jump
 
         mouse_last_x = mouse_x;
         mouse_last_y = mouse_y;
@@ -189,9 +213,9 @@ int main(void) {
             camera_pos[2] += camera_dir[0] * walk_speed * delta_time;
         }
 
-        if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS) {
-            camera_pos[1] += walk_speed * delta_time;
-        }
+        // if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS) {
+        //     camera_pos[1] += walk_speed * delta_time;
+        // }
         if (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS) {
             camera_pos[1] -= walk_speed * delta_time;
         }
