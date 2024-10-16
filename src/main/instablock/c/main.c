@@ -105,7 +105,7 @@ int main(void) {
 
     // load objects
     struct RenderObject obj2 = load_render_object("demo2.obj", 1);
-    set_position(obj2, 0, 0, -5);
+    set_position(&obj2, 0, 0, -5);
 
     struct World world = generate_world(20);
 
@@ -142,11 +142,12 @@ int main(void) {
         delta_time   = current_time - last_time;
 
         // ground collision and jump
+        int ground = get_ground_under_player(world, camera_pos[0], camera_pos[1], camera_pos[2]);
         int on_ground = 0;
         player_velocity -= 9.81f * delta_time * 2;
-        if (camera_pos[1] <= -2) {
+        if (camera_pos[1] <= ground + 3) {
             // player on ground
-            camera_pos[1]   = -2;
+            camera_pos[1]   = ground + 3;
             player_velocity = 0;
             on_ground       = 1;
             if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS) {
@@ -159,7 +160,7 @@ int main(void) {
         }
 
         int space_pressed = glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS;
-        printf("delta: %f, player_velocity: %f, on_ground: %d, space_pressed: %d\n", delta_time, player_velocity, on_ground, space_pressed);
+        printf("delta: %f, player_velocity: %f, ground: %d, on_ground: %d, space_pressed: %d\n", delta_time, player_velocity, ground, on_ground, space_pressed);
 
         // end ground collision and jump
 

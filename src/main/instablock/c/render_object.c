@@ -15,7 +15,7 @@ struct RenderObject load_render_object(char *file_path, int texture) {
     // 24 floats
     glBufferData(GL_ARRAY_BUFFER, loaded_faces * 24 * sizeof(GLfloat), buffer, GL_STATIC_DRAW);
     struct RenderObject ro = {bufferId, loaded_faces, 0, 0, 0, create_matrix4(), texture};
-    set_position(ro, 0, 0, 0);
+    set_position(&ro, 0, 0, 0);
     return ro;
 }
 
@@ -53,9 +53,9 @@ void render(struct RenderObject render_object, GLuint modelID, GLuint textureID)
     glDisableVertexAttribArray(2);
 }
 
-void set_position(struct RenderObject render_object, float x, float y, float z) {
-    render_object.x = x;
-    render_object.y = y;
-    render_object.z = z;
-    set_translation_matrix4(render_object.x, render_object.y, render_object.z, render_object.modelMatrix);
+void set_position(struct RenderObject *render_object, float x, float y, float z) {
+    render_object->x = x;
+    render_object->y = y;
+    render_object->z = z;
+    set_translation_matrix4(render_object->x, render_object->y, render_object->z, render_object->modelMatrix);
 }

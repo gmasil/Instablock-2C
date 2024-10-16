@@ -11,6 +11,7 @@ struct World {
 struct World generate_world(int world_size);
 void destroy_world(struct World world);
 int is_block_at(struct World world, int x, int y, int z);
+int get_ground_under_player(struct World world, float x, float y, float z);
 void render_world(struct World world, GLuint modelID, GLuint textureID);
 
 #endif // WORLD_H

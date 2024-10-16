@@ -2,9 +2,9 @@
 
 #include "world.h"
 
-void add_cube(struct RenderObject *world, int *current_index, int x, int y, int z) {
-    world[*current_index] = load_render_object("cube.obj", 0);
-    set_position(world[*current_index], x, y, z);
+void add_cube(struct RenderObject *cubes, int *current_index, int x, int y, int z) {
+    cubes[*current_index] = load_render_object("cube.obj", 0);
+    set_position(&(cubes[*current_index]), x, y, z);
     (*current_index)++;
 }
 
@@ -46,4 +46,14 @@ void render_world(struct World world, GLuint modelID, GLuint textureID) {
     for (int i = 0; i < world.cube_amount; i++) {
         render(world.cubes[i], modelID, textureID);
     }
+}
+
+int get_ground_under_player(struct World world, float x, float y, float z) {
+    int bx = x;
+    int by = y;
+    int bz = z;
+    while (!is_block_at(world, bx, by, bz) && by > -10) {
+        by--;
+    }
+    return by;
 }
